@@ -1,2 +1,15 @@
 ---
-# defaults file for ansible_slack_sarge
+# Slack token, this need to be a webhook token, create an webhook app
+slack_token: ''
+# Slack Username
+slack_username: 'Ansible'
+# act report command
+act_sarg: 'reportlist'
+# Actifio Appliance
+act_appliance: ''
+# Actifio Username
+act_user: admin
+# Password
+act_pass: password
+# VendorKey, this can be requested from the Customer Success Engineering team via a case.
+act_vendorkey: ''

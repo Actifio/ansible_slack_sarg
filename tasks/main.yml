@@ -1,2 +1,47 @@
 ---
-# tasks file for ansible_slack_sarge
+
+- name: check the existing session id is ok
+  uri: 
+    url: "{{ act_api_info }}/lsversion?sessionid={{ act_sessionid }}"
+    validate_certs: no
+  register: session_ok
+  when: act_sessionid is defined
+
+# Generate a login token using the username, password and vendorkey
+- name: geenrate auth token is not fact set or session has expired
+  block:
+    - name: generating authentication token 
+      uri:
+        url: "{{ act_api_login }}"
+        validate_certs: no  
+      register: logintoken
+      
+    - name: session id is a fact
+      set_fact: 
+        act_sessionid: "{{ logintoken.json.sessionid }}"
+  when: act_sessionid is not defined or session_ok.status != 200
+
+- name: format the report command
+  set_fact:
+    report_command: "{{ act_sarg | format_command() }}"
+
+- name: run the sarg command
+  uri:
+    url: "{{ act_api_report }}/{{ report_command }}&sessionid={{ act_sessionid }}"
+    validate_certs: no
+  register: report_output 
+  
+- name: filter out the report format
+  set_fact:
+    cmd_output:  "{{report_output | report_format ( act_sarg_format )}}"
+
+- name: post to slack
+  slack:
+    token: "{{ slack_token }}"
+    username: "{{ slack_username }}"
+    attachments: 
+      - text: "```{{ cmd_output }}```"
+        title: "This is the output of: {{ act_sarg }} "
+        username: "{{ slack_username }}"
+        mrkdwn: true
+  delegate_to: localhost
