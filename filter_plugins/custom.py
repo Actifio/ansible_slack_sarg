@@ -18,10 +18,11 @@ def report_format (values, columns):
     for item in values['json']['result']:
         for key, val in enumerate(table):
             table[key][1].append(item[val[0]])
-        if max_width[key][1] == 0:
-            max_width[key][1] = len(item[val[0]])
-        elif max_width[key][1] < len(item[val[0]]):
-            max_width[key][1] = len(item[val[0]])
+            if max_width[key][1] == 0:
+                max_width[key][1] = len(item[val[0]])
+            elif max_width[key][1] < len(item[val[0]]):
+                max_width[key][1] = len(item[val[0]])
+            # print "%s legth: %d"%(val,max_width[key][1])
     
     # Print the headers
     for cols , hitem in enumerate(table):
